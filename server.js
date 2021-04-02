@@ -1,11 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const app = express();
-const dotenv = require("dotenv");
 app.use(express.json());
 
-const url = "mongodb+srv://admin-nishith:abcd1234@cluster0.dzffz.mongodb.net/Clementiusdb";
+const url = process.env.MONGO_URI;
 
 mongoose.connect(url , {useNewUrlParser:true , useUnifiedTopology:true,useCreateIndex:true});
 
