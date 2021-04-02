@@ -2,11 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const app = express();
+const dotenv = require("dotenv");
 app.use(express.json());
 
 const url = "mongodb+srv://admin-nishith:abcd1234@cluster0.dzffz.mongodb.net/Clementiusdb";
 
-mongoose.connect(url , {useNewUrlParser:true , useUnifiedTopology:true});
+mongoose.connect(url , {useNewUrlParser:true , useUnifiedTopology:true,useCreateIndex:true});
 
 const clemSchema = new mongoose.Schema({
 key:String,
