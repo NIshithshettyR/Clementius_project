@@ -49,7 +49,7 @@ body{
 
 .viewpage{
     padding: 5%;
-    min-width:10vh;
+    min-width:90vw;
     height: 80vh;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -81,9 +81,19 @@ body{
 }
 
 .searchfield{
-    margin: 10px 0px;
-    padding: 15px 70px;
-    transform: translateX(100%);
+    margin: 10px 0;
+    width:500px;
+    height: 50px;
+    padding: 15px 20px;
+    transform: translateX(5%);
+    font-size: 1.1rem;
+}
+
+.searchfield::-webkit-search-cancel-button{
+    -webkit-appearance: none;
+    width:30px;
+    height: 30px;
+    background: url("https://pro.fontawesome.com/releases/v5.10.0/svgs/solid/times-circle.svg");
 }
 
 .usersearch{
@@ -109,14 +119,20 @@ body{
     outline: none;
 }
 
-.btn1{
+.btn1,.newbtn{
     padding: 10px; 
     width: 100px;
     height: 40px;
     text-align: center;
 }
 
-.addeduser,.saving{
+.newbtn{
+    color:white;
+    margin-top: 10px;
+    background-color: green;
+}
+
+.addeduser,.saving,.saving_user{
     padding: 10px;
     list-style-type: none;
     width:200px;
@@ -127,7 +143,14 @@ body{
     top:0;
 }
 
-.saving{
+.addeduser{
+    top:-10%;
+    right:0;
+    left: -100%;
+    padding:15px;
+}
+
+.saving,.saving_user{
     margin-top: 10px;
     min-height: unset;
     height:60px;
@@ -135,6 +158,9 @@ body{
     bottom: 0;
     text-align: center;
     font-size: 0.8rem;
+}
+.saving_user{
+    right: 20px; 
 }
 .green{
     border: 2px solid green;

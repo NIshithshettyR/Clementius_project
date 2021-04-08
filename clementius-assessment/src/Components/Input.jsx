@@ -4,6 +4,7 @@ function Input(props) {
     return (
         <div>
             <input
+            id={props.id}
             onChange={props.change}
             type={props.type}
             className={props.class}

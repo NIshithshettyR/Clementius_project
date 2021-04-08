@@ -10,12 +10,12 @@ const url = process.env.MONGO_URI;
 mongoose.connect(url , {useNewUrlParser:true , useUnifiedTopology:true,useCreateIndex:true});
 
 const clemSchema = new mongoose.Schema({
-key:String,
-firstname:String,
-lastname:String,
-email:String,
-dob:String,
-bio:String
+    key:String,
+    firstname:String,
+    lastname:String,
+    email:String,
+    dob:String,
+    bio:String
 });
 
 const Clem = mongoose.model("Clem" , clemSchema);
@@ -39,6 +39,7 @@ app.post("/user/" , (req , res)=>{
 
     Clem.find({}, (err , foundUsers)=>{
         if(foundUsers.length === 0){
+
             User1.save((err)=>{
                 if(!err){
                     console.log("First user saved");
@@ -46,16 +47,17 @@ app.post("/user/" , (req , res)=>{
             })
         }else{
             User1.save((err)=>{
-                console.log("User saved");
+                if(!err){console.log("User saved");}
             });
         }
     });
 });
 
+
 app.get("/clem" , (req , res)=>{
     Clem.find({}, (err , foundUsers)=>{
-        res.send({data : foundUsers});
-    });
+        if(!err){res.send({data : foundUsers});}
+    }).sort({lastname : 1 , dob : 1 });
 });
 
 app.post("/delete" , (req , res)=>{
@@ -71,16 +73,34 @@ app.post("/delete" , (req , res)=>{
 });
 
 app.post("/edit" , (req , res)=>{
-    let id = req.body;
-    console.log(req.body);
-    Clem.updateMany({key : id} , (err,foundId)=>{
+    let id = req.body.updateddata.updatedkey;
+    let name = req.body.updateddata.updatedname;
+    let value = req.body.updateddata.updatedvalue;
+    let previous = req.body.updateddata.previousvalue;
+    Clem.find({key  : id} , (err , foundUser)=>{
         if(!err){
-            console.log("Successfully Updated");
-        }else{
-            console.log("Not found");
+            (name === foundUser[0].firstname) && Clem.updateOne({} , (err)=>{
+                    foundUser[0].firstname = value;
+            });
+            (previous === foundUser[0].lastname) && Clem.updateOne({} , (err)=>{
+                    foundUser[0].lastname = value;
+            });
+            (previous === foundUser[0].email) && Clem.updateOne({} , (err)=>{
+                    foundUser[0].email = value;
+            });
+            (previous === foundUser[0].dob) && Clem.updateOne({} , (err)=>{
+                    foundUser[0].dob = value;
+            });
+            (previous === foundUser[0].bio) && Clem.updateOne({} , (err)=>{
+                    foundUser[0].bio = value;
+            });
+            foundUser[0].save(()=>{
+                    console.log("Its Saved");
+            });
         }
-    });
+    })
 });
+
 
 app.listen(4000 , ()=>{
     console.log("Server has started at port 4000");

@@ -3,13 +3,13 @@ import Button from "../Components/Buttons";
 import Input from "../Components/Input";
 import Textarea from "../Components/Textarea";
 import { Zoom } from '@material-ui/core';
+import Search from '@material-ui/icons/Search';
 import axios from "axios";
-
 
 function Front() {
 //  React useState
     const [home , setHome] = useState(true);
-    const [click , setClick] = useState(false);
+    const [click , setClick] = useState("");
     const [view , setView] = useState(false);
     // useState that set the userdetails and passes the data to server.
     const [content ,setContent] = useState([{
@@ -27,8 +27,10 @@ function Front() {
     const [color , setColor] = useState();
     const [saveduser , setSaveduser] = useState("");
     const [updated , setUpdated] = useState({
+        updatedkey :"",
         updatedname : "",
-        updatedvalue : ""
+        updatedvalue : "",
+        previousvalue : ""
     });
 
     // --------------------------------------------------------------------
@@ -69,7 +71,7 @@ function Front() {
 
     // When the form is submitted , the data will be passed to the server through "axios"
     function HandleRegister(event){
-        setSubmit(true);
+        setSubmit(true); 
         setUser(() =>{
             axios.post("http://localhost:4000/user/" , content)
             .then(res =>{
@@ -79,10 +81,11 @@ function Front() {
                 console.log(err);
             })
         });
-        
-        setInterval(() => {
+        event.preventDefault();
+        setTimeout(() => {
             setSubmit(false);
-            event.preventDefault();
+            setClick(false);
+            setHome(true);          
         }, 5000);
     }
 
@@ -95,8 +98,12 @@ function Front() {
     // Function to delete each row in the table.
     function HandleDelete(event){
         let deleteid = event.target.value;
+        setClick(deleteid);
+        setTimeout(() => {
+            setClick("");
+        }, 1000);
                 // Requesting the server to delete the content of the user in database.
-            axios.post("http://localhost:4000/delete" , {key : deleteid})
+                axios.post("http://localhost:4000/delete" , {key : deleteid})
                 .then(res=>{
                     console.log(res);
                 })
@@ -108,38 +115,48 @@ function Front() {
 
     function HandleUpdate(event){
         let editid = event.target.value;
+        setClick("Update");
+        setTimeout(() => {
+            setClick("");
+        }, 3000);
         // Requesting the server to update the content of the user in database.
-        axios.post("http://localhost:4000/edit" ,{updateddata:updated})
+        axios.post("http://localhost:4000/edit" ,{updateddata : updated})
         .then(res =>{
             console.log(res);
         })
         .catch(err=>{
             console.log(err);
         });
-        console.log(event.target.value);
+        console.log(editid);
     }
 
     function Handledata(event){
         console.log(event.target);
-        console.log(event.target.name , event.target.value,event.target.placeholder);
-        const {name , value}= event.target;
+        console.log(event.target.name , event.target.value,event.target.id,event.target.placeholder);
+        const {name , value , id , placeholder}= event.target;
         setUpdated((prevItems) =>{
         return {
+            updatedkey : id,
             updatedname : name,
-            updatedvalue : value
+            updatedvalue : value,
+            previousvalue : placeholder
         };
         });
         console.log(updated);
     }
     
     function HandleSave(){
-        setView(false);
-        setHome(true);
+        setTimeout(() => {
+            setView(false);
+            setHome(true);  
+        }, 1000);
         setSaved(true);
+        setClick("Saved");
         setTimeout(() => {
             setView(true);
             setHome(false);
-        }, 2000);
+            setClick("");
+        }, 3000);
     }
 
     function HandleSearch(event){
@@ -271,17 +288,20 @@ function Front() {
                 
                 <div className="flex-column viewpage">
                         <div>
-                        <Input 
-                            change={HandleSearch}
-                            type="search"
-                            class="searchfield"
-                            name="search"
-                            placeholder="Search-user"
-                            auto="autofocus"
-                            complete="off"
-                        />
-                        {(color === false)&&<p className="saving">No Matching user found.</p>}
-                        {(color === true)&& <p className="saving green">User found.</p>}
+                        <div className="flex">
+                                <Search/>
+                                <Input
+                                    change={HandleSearch}
+                                    type="search"
+                                    class="searchfield"
+                                    name="search"
+                                    placeholder="Search-user"
+                                    auto="autofocus"
+                                    complete="off"/>
+                                
+                        </div>
+                        {(color === false)&&<p className="saving saving_user">No Matching user found.</p>}
+                        {(color === true)&& <p className="saving saving_user green">User found.</p>}
                             <table className="table_content">
                                 <tbody>
                                 <tr>
@@ -296,16 +316,15 @@ function Front() {
                                 {/* The userdata is mapped to display each users data. */}
                                 {data2.map(each =>
                                     <tr>
-                                        <td contentEditable={edit} value = {each.key}>{each.key}</td>
+                                        <td  value = {each.key}>{each.key}</td>
                                         <td 
-                                            class = {(color === true && each.firstname.substring(0,1) === saveduser)&& "usersearch"} 
+                                            className = {(color === true && each.firstname.substring(0,1) === saveduser)&& "usersearch"} 
                                 
                                             onBlur={Handledata} 
-                                            contentEditable={edit} 
                                             value={each.firstname}>
                                             {(edit === false)? each.firstname:
                                                 <Input 
-                                                        key={each.key}
+                                                        id={each.key}
                                                         name="firstname" 
                                                         class="editdetails" 
                                                         type="text" 
@@ -316,29 +335,27 @@ function Front() {
 
                                         <td 
                                         onBlur={Handledata}
-                                        contentEditable={edit} 
-                                        value={each.lastname}>
+                                        value={each.lastname} >
                                         {(edit === false)?each.lastname:
                                             <Input 
-                                                        key={each.key}
+                                                        id={each.key}
                                                         name="lastname" 
                                                         class="editdetails" 
                                                         type="text" 
                                                         placeholder={each.lastname}
-                                                >{each.lastname}</Input>
+                                            >{each.lastname}</Input>
                                         }
                                         </td>
 
                                         <td 
                                         onBlur={Handledata}
-                                        contentEditable={edit} 
-                                        value={each.email}>
+                                        value={each.email} >
                                         {(edit === false)?each.email :
                                             <Input 
-                                                        key={each.key}
+                                                        id={each.key}     
                                                         name="email" 
                                                         class="editdetails" 
-                                                        type="text" 
+                                                        type="email" 
                                                         placeholder={each.email}
                                                 >{each.email}</Input>
                                         }
@@ -346,15 +363,13 @@ function Front() {
 
                                         <td 
                                         onBlur={Handledata}
-                                        contentEditable={edit} 
-                                        value={each.dob}
-                                        >
+                                        value={each.dob} >
                                         {(edit === false)? each.dob :
                                             <Input 
-                                                        key={each.key}
+                                                        id={each.key}
                                                         name="dob" 
                                                         class="editdetails" 
-                                                        type="text" 
+                                                        type="date" 
                                                         placeholder={each.dob}
                                                 >{each.dob}</Input>
                                         }
@@ -362,11 +377,10 @@ function Front() {
 
                                         <td 
                                         onBlur={Handledata}
-                                        contentEditable={edit} 
-                                        value={each.bio}>
+                                        value={each.bio} >
                                         {(edit === false)?each.bio : 
                                             <Input 
-                                                        key={each.key}
+                                                        id={each.key}
                                                         name="bio" 
                                                         class="editdetails" 
                                                         type="text" 
@@ -387,14 +401,14 @@ function Front() {
                                                     click={HandleDelete}
                                                     class="btn1"
                                                     type="submit" 
-                                                    buttonname="Delete"
+                                                    buttonname={(click === each.key )? "Deleting..." : "Delete"}
                                                     value={each.key}
                                                 />
                                                 <Button
                                                     click={HandleUpdate}
-                                                    class="btn1"
+                                                    class={(click === "Update")? "newbtn" : "btn1"}
                                                     type="submit" 
-                                                    buttonname="Update"
+                                                    buttonname={(click === each.key )? "Updating..." : "Update"}
                                                     value={each.key}
                                                 />
                                             </div>
@@ -409,7 +423,7 @@ function Front() {
                             click={HandleSave}
                             type="submit"
                             class="btn"
-                            buttonname="Save"
+                            buttonname={(click === "Saved")? "Saved" : "Save"}
                             ></Button>
                         </div>
                 </div>
